@@ -4,7 +4,7 @@ from MyOdata import Service as MyOdata
 
 odata = MyOdata('https://oktnb132.inf.elte.hu:51006/index.xsodata/')
 
-qn = "Ozone_2"
+qn = "Ozone_1"
 
 data = odata.query(qn)
 

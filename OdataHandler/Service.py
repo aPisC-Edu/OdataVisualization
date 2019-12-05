@@ -3,7 +3,23 @@ import pyodata
 import numpy
 from .EntityDefinition import EntityDefinition
 
+_mapper = {
+    "float64" : {
+        '0.0d': float('nan')
+    }
+}
+
+def _mapvalue(type, value):
+    if type.name in _mapper:
+        if value in _mapper[type.name]:
+            return _mapper[type.name][value]
+    return value
+
+def _mapItem(i, dtype):
+    return tuple(_mapvalue(dtype[n] , getattr(i, n)) for n in dtype.names)
+
 class Service(object):
+
     entities = {}
     def __init__(self, url, session = None):
         self.session = session if session is not None else requests.session()
@@ -28,9 +44,9 @@ class Service(object):
 
         rawData = self._fetchData(_q)
 
-        return numpy.array( \
-            [ tuple(getattr(i, n) for n in dtype.names) for i in rawData ], \
-            dtype=dtype \
+        return numpy.array( 
+            [ _mapItem(i, dtype) for i in rawData ], 
+            dtype=dtype 
         )
     
     def _fetchData(self, _q):
